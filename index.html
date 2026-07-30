@@ -229,22 +229,24 @@ function matches(b){
 
 // ---- cover resolution (Google Books, then Open Library) ----
 async function fetchCover(b){
-  if(b.n in coverCache) return coverCache[b.n];
+  if(coverCache[b.n]) return coverCache[b.n];
   const query=b.q||(b.t+" "+primaryAuthor(b.a));
   let url=null;
+  // 1) Open Library (no aggressive rate-limit)
   try{
-    const g=await fetch("https://www.googleapis.com/books/v1/volumes?country=US&maxResults=1&q="+encodeURIComponent(query));
-    if(g.ok){const d=await g.json();const il=d.items&&d.items[0]&&d.items[0].volumeInfo&&d.items[0].volumeInfo.imageLinks;
-      if(il){url=(il.thumbnail||il.smallThumbnail||"").replace(/^http:/,"https:").replace("&edge=curl","");}}
+    const o=await fetch("https://openlibrary.org/search.json?limit=1&fields=cover_i&q="+encodeURIComponent(query));
+    if(o.ok){const d=await o.json();const doc=d.docs&&d.docs[0];
+      if(doc&&doc.cover_i){url="https://covers.openlibrary.org/b/id/"+doc.cover_i+"-M.jpg";}}
   }catch(e){}
+  // 2) Google Books (better coverage, but rate-limits)
   if(!url){
     try{
-      const o=await fetch("https://openlibrary.org/search.json?limit=1&q="+encodeURIComponent(query));
-      if(o.ok){const d=await o.json();const doc=d.docs&&d.docs[0];
-        if(doc&&doc.cover_i){url="https://covers.openlibrary.org/b/id/"+doc.cover_i+"-M.jpg";}}
+      const g=await fetch("https://www.googleapis.com/books/v1/volumes?country=US&maxResults=1&q="+encodeURIComponent(query));
+      if(g.ok){const d=await g.json();const il=d.items&&d.items[0]&&d.items[0].volumeInfo&&d.items[0].volumeInfo.imageLinks;
+        if(il){url=(il.thumbnail||il.smallThumbnail||"").replace(/^http:/,"https:").replace("&edge=curl","");}}
     }catch(e){}
   }
-  coverCache[b.n]=url;
+  if(url) coverCache[b.n]=url;   // cache only hits, so misses retry on reload/filter
   return url;
 }
 
@@ -262,7 +264,7 @@ function applyCover(el,url,b){
 }
 
 // throttled cover loader — avoids rate-limiting from firing 51 lookups at once
-let coverQueue=[];let activeLoads=0;const MAX_CONCURRENT=4;
+let coverQueue=[];let activeLoads=0;const MAX_CONCURRENT=3;
 function pumpQueue(){
   while(activeLoads<MAX_CONCURRENT && coverQueue.length){
     const {b,el}=coverQueue.shift();activeLoads++;
@@ -275,7 +277,7 @@ function coverTile(b){
   el.className="cover"+(b.unc?" unc":"");
   el.innerHTML=`<span class="num">${String(b.n).padStart(2,'0')}</span><div class="spinef"></div>`+fallbackCover(b);
   el.onclick=()=>openCard(b);
-  if(b.n in coverCache){applyCover(el,coverCache[b.n],b);}   // already resolved this session
+  if(coverCache[b.n]){applyCover(el,coverCache[b.n],b);}     // already resolved this session
   else{coverQueue.push({b,el});}                             // queue for throttled fetch
   return el;
 }
