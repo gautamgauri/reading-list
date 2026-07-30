@@ -192,6 +192,10 @@ const BOOKS = [
  {n:51, t:"Heart Lamp: Selected Stories", a:"Banu Mushtaq", type:"Fiction", lang:"Kannada", genres:["Short stories"], note:"International Booker 2025 (tr. Deepa Bhasthi); stories of Muslim women's lives in southern India."}
 ];
 
+// Pre-resolved Open Library cover IDs (baked in so no live API call is needed)
+const COVERS={2:12677170,3:10513792,4:14981460,5:419965,6:568646,7:7981639,10:4962050,11:1129808,12:4788413,13:13877901,14:8246100,15:1558761,17:100760,18:6821235,20:5019991,24:911254,25:8346713,26:10513792,28:4648257,29:7528581,30:13190092,31:13460589,33:106410,34:6763274,36:4052,38:7090865,39:10489454,40:9407894,42:12717343,45:2323675,47:8348310,49:15110598,50:94764,51:15179945};
+function coverUrlFor(b){return COVERS[b.n]?("https://covers.openlibrary.org/b/id/"+COVERS[b.n]+"-L.jpg"):(coverCache[b.n]||null);}
+
 const FBMOTIF=`<svg class="fbmotif" viewBox="0 0 90 16" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="0" y1="8" x2="90" y2="8" stroke-dasharray="2 4"/><circle cx="45" cy="8" r="4.2"/><circle cx="45" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="20" cy="8" r="2"/><circle cx="70" cy="8" r="2"/></svg>`;
 function hkey(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}return h;}
 function primaryAuthor(a){return a.split(/[·&,]/)[0].trim();}
@@ -277,8 +281,9 @@ function coverTile(b){
   el.className="cover"+(b.unc?" unc":"");
   el.innerHTML=`<span class="num">${String(b.n).padStart(2,'0')}</span><div class="spinef"></div>`+fallbackCover(b);
   el.onclick=()=>openCard(b);
-  if(coverCache[b.n]){applyCover(el,coverCache[b.n],b);}     // already resolved this session
-  else{coverQueue.push({b,el});}                             // queue for throttled fetch
+  const url=coverUrlFor(b);
+  if(url){applyCover(el,url,b);}          // baked-in or already-resolved cover
+  else{coverQueue.push({b,el});}          // queue for throttled live fetch
   return el;
 }
 
@@ -306,7 +311,8 @@ function render(){
 function openCard(b){
   const c=document.getElementById("card");
   const tags=[`<span class="tag type">${b.type}</span>`,`<span class="tag lang">${b.lang}</span>`].concat(b.genres.map(g=>`<span class="tag">${g}</span>`)).join("");
-  const coverHTML=(b.n in coverCache && coverCache[b.n])?`<img src="${coverCache[b.n]}" alt="">`:`<div style="position:absolute;inset:0">${fallbackCover(b)}</div>`;
+  const cu=coverUrlFor(b);
+  const coverHTML=cu?`<img src="${cu}" alt="">`:`<div style="position:absolute;inset:0">${fallbackCover(b)}</div>`;
   c.innerHTML=`
     <button class="close" onclick="closeCard()">&times;</button>
     <div class="card-flex">
