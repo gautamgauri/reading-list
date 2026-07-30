@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A South Asian Reading List — Curated by Meenakshi Sharma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Spectral:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#efe7d4;--paper-2:#e7ddc6;--ink:#1b1712;--ink-soft:#3a332a;
+    --red:#9c2b1f;--shelf:#1b1712;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);color:var(--ink);font-family:'Spectral',Georgia,serif;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(27,23,18,0.028) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 70% 60%, rgba(27,23,18,0.022) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 45% 85%, rgba(27,23,18,0.02) 0 1px, transparent 1.5px);
+    background-size:37px 37px, 53px 53px, 71px 71px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 20px 80px;}
+
+  header{text-align:center;position:relative;padding:14px 0 4px;}
+  .motif{width:100%;max-width:620px;height:34px;margin:0 auto;display:block;color:var(--ink);}
+  h1{font-family:'Cormorant Garamond',serif;font-weight:600;letter-spacing:.5px;font-size:clamp(30px,5vw,52px);margin:12px 0 4px;line-height:1.02;}
+  .subtitle{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,2vw,20px);font-style:italic;color:var(--ink-soft);margin:0 0 2px;}
+  .credit{font-size:13px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-soft);margin-top:8px;}
+  .credit b{color:var(--red);font-weight:500;}
+
+  .controls{margin:26px auto 8px;max-width:960px;}
+  .searchrow{display:flex;justify-content:center;margin-bottom:16px;gap:10px;align-items:center;flex-wrap:wrap;}
+  .search{width:min(420px,80%);background:transparent;border:none;border-bottom:1.5px solid var(--ink);padding:8px 6px;font-family:'Spectral',serif;font-size:16px;color:var(--ink);text-align:center;}
+  .search:focus{outline:none;border-bottom-color:var(--red);}
+  .search::placeholder{color:#8a8172;font-style:italic;}
+  .toggle{font-family:'Spectral',serif;font-size:12.5px;letter-spacing:.5px;background:transparent;border:1px solid var(--ink);border-radius:2px;padding:5px 12px;cursor:pointer;}
+  .toggle.on{background:var(--ink);color:var(--paper);}
+
+  .filtergroup{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:10px;}
+  .glabel{width:100%;text-align:center;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8a8172;margin:6px 0 2px;}
+  .chip{font-family:'Spectral',serif;font-size:13.5px;letter-spacing:.3px;background:transparent;color:var(--ink);border:1px solid var(--ink);border-radius:2px;padding:4px 12px;cursor:pointer;transition:all .16s ease;}
+  .chip:hover{background:rgba(27,23,18,.08);}
+  .chip.active{background:var(--ink);color:var(--paper);}
+  .count{text-align:center;font-style:italic;color:var(--ink-soft);font-size:14px;margin:10px 0 4px;}
+
+  .shelf{position:relative;margin:0 0 10px;padding:0 6px;}
+  .books{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px;min-height:190px;}
+  .shelf-plank{height:10px;background:var(--shelf);border-radius:1px;margin-top:4px;box-shadow:0 6px 10px -6px rgba(27,23,18,.6);}
+  .shelf-plank::after{content:"";display:block;height:2px;background:var(--paper);margin:3px 8px 0;opacity:.35;}
+
+  /* front-facing cover tile */
+  .cover{position:relative;width:118px;height:176px;cursor:pointer;flex:none;transition:transform .18s ease;border:1.5px solid var(--ink);background:var(--paper);box-shadow:3px 4px 0 -1px rgba(27,23,18,.25);overflow:hidden;}
+  .cover:hover{transform:translateY(-12px);}
+  .cover img{width:100%;height:100%;object-fit:cover;display:block;}
+  .cover .num{position:absolute;top:0;left:0;background:var(--ink);color:var(--paper);font-size:10px;letter-spacing:1px;padding:2px 6px;z-index:3;}
+  .cover.unc .num{background:var(--red);}
+  .cover .spinef{position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--ink);opacity:.9;z-index:2;}
+
+  /* designed fallback cover */
+  .fb{position:absolute;inset:0;display:flex;flex-direction:column;padding:22px 12px 12px;text-align:center;}
+  .fb.dark{background:var(--ink);color:var(--paper);}
+  .fb .fbmotif{height:16px;margin-bottom:8px;color:currentColor;flex:none;}
+  .fb .fbtitle{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:15px;line-height:1.12;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;flex:1;}
+  .fb .fbauthor{font-size:10.5px;font-style:italic;letter-spacing:.3px;margin-top:6px;opacity:.85;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:none;}
+  .fb .fbrule{height:1px;background:currentColor;opacity:.5;margin:6px 10px;flex:none;}
+
+  body.ink .cover img{filter:grayscale(1) contrast(1.06) brightness(1.02);}
+
+  .overlay{position:fixed;inset:0;background:rgba(20,17,12,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .overlay.show{display:flex;}
+  .card{background:var(--paper);border:2px solid var(--ink);max-width:600px;width:100%;padding:0;position:relative;box-shadow:0 24px 60px -20px rgba(0,0,0,.6);max-height:88vh;overflow:auto;display:flex;flex-direction:column;}
+  .card-flex{display:flex;gap:0;}
+  .card-cover{flex:none;width:150px;border-right:1.5px solid var(--ink);background:var(--paper-2);position:relative;}
+  .card-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+  .card-main{flex:1;min-width:0;}
+  .card-top{position:relative;padding:26px 28px 16px;border-bottom:1.5px solid var(--ink);}
+  .card-top .cnum{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-soft);}
+  .card h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:27px;line-height:1.06;margin:8px 0 6px;}
+  .card .cauthor{font-style:italic;font-size:17px;color:var(--red);margin:0;}
+  .card-body{padding:18px 28px 26px;}
+  .meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+  .tag{font-size:12px;letter-spacing:.5px;border:1px solid var(--ink);padding:3px 10px;border-radius:2px;background:transparent;}
+  .tag.type{background:var(--ink);color:var(--paper);}
+  .tag.lang{border-style:dashed;}
+  .card .note{font-size:15px;line-height:1.55;color:var(--ink-soft);margin:0;}
+  .card .flag{margin-top:14px;font-size:13px;color:var(--red);border-top:1px dotted var(--red);padding-top:10px;font-style:italic;}
+  .close{position:absolute;top:10px;right:14px;background:none;border:none;font-size:26px;line-height:1;cursor:pointer;color:var(--ink);font-family:serif;z-index:5;}
+  .close:hover{color:var(--red);}
+
+  footer{text-align:center;margin-top:40px;color:#8a8172;font-size:12.5px;font-style:italic;line-height:1.6;}
+  .footmotif{width:180px;height:20px;margin:18px auto 10px;display:block;color:var(--ink);opacity:.8;}
+
+  @media(max-width:560px){.card-flex{flex-direction:column;}.card-cover{width:100%;height:200px;border-right:none;border-bottom:1.5px solid var(--ink);}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg class="motif" viewBox="0 0 620 34" fill="none" stroke="currentColor" stroke-width="1.4">
+      <line x1="0" y1="17" x2="620" y2="17" stroke-dasharray="2 5"/>
+      <g><circle cx="310" cy="17" r="9"/><circle cx="310" cy="17" r="3.5" fill="currentColor" stroke="none"/>
+        <g stroke-width="1.2"><line x1="310" y1="4" x2="310" y2="8"/><line x1="310" y1="26" x2="310" y2="30"/><line x1="297" y1="17" x2="301" y2="17"/><line x1="319" y1="17" x2="323" y2="17"/></g></g>
+      <g transform="translate(250,17)"><path d="M0 0 q10 -8 22 0 q-10 8 -22 0 z"/><path d="M22 0 l8 -5 l0 10 z"/><circle cx="7" cy="0" r="1.2" fill="currentColor" stroke="none"/></g>
+      <g transform="translate(370,17) scale(-1,1)"><path d="M0 0 q10 -8 22 0 q-10 8 -22 0 z"/><path d="M22 0 l8 -5 l0 10 z"/><circle cx="7" cy="0" r="1.2" fill="currentColor" stroke="none"/></g>
+      <g stroke-width="1.2"><circle cx="180" cy="17" r="4"/><circle cx="440" cy="17" r="4"/></g>
+    </svg>
+    <h1>A South Asian Reading List</h1>
+    <p class="subtitle">Fifty-one books across languages, from Partition to the Booker</p>
+    <p class="credit">Curated by <b>Meenakshi &ldquo;Mira&rdquo; Sharma</b></p>
+  </header>
+
+  <div class="controls">
+    <div class="searchrow">
+      <input class="search" id="search" type="text" placeholder="Search author, title, or theme&hellip;">
+      <button class="toggle" id="inkToggle" title="Show covers in black &amp; white">Ink mode</button>
+    </div>
+    <div class="filtergroup" id="typeFilters"><span class="glabel">Form</span></div>
+    <div class="filtergroup" id="langFilters"><span class="glabel">Language</span></div>
+    <div class="filtergroup" id="genreFilters"><span class="glabel">Theme</span></div>
+    <p class="count" id="count"></p>
+  </div>
+
+  <div id="shelves"></div>
+
+  <footer>
+    <svg class="footmotif" viewBox="0 0 180 20" fill="none" stroke="currentColor" stroke-width="1.3">
+      <line x1="0" y1="10" x2="180" y2="10" stroke-dasharray="2 4"/>
+      <circle cx="90" cy="10" r="5"/><circle cx="90" cy="10" r="1.6" fill="currentColor" stroke="none"/>
+    </svg>
+    Click any cover to open the book. Uncertain entries are marked in <span style="color:var(--red)">red</span>.<br>
+    Covers loaded live from Google Books / Open Library; a drawn cover stands in where none is found.
+  </footer>
+</div>
+
+<div class="overlay" id="overlay"><div class="card" id="card"></div></div>
+
+<script>
+const BOOKS = [
+ {n:1, t:"Bhimayana: Experiences of Untouchability", a:"Srividya Natarajan & S. Anand · art by Durgabai & Subhash Vyam", q:"Bhimayana Experiences of Untouchability", type:"Graphic", lang:"English", genres:["Caste","Biography","Graphic"], note:"A graphic biography of B. R. Ambedkar, illustrated by Pardhan-Gond artists. Published by Navayana."},
+ {n:2, t:"Jaya / Myth = Mithya", a:"Devdutt Pattanaik", q:"Jaya Devdutt Pattanaik", type:"Non-fiction", lang:"English", genres:["Mythology"], note:"Title not recorded; his best-known works are the Mahabharata retelling Jaya and Myth = Mithya."},
+ {n:3, t:"The God of Small Things", a:"Arundhati Roy", type:"Fiction", lang:"English", genres:["Literary","Kerala"], note:"Booker Prize 1997. A family in Kerala undone by love that breaks social law."},
+ {n:4, t:"Mother Mary Comes to Me", a:"Arundhati Roy", type:"Non-fiction", lang:"English", genres:["Memoir"], note:"Roy's 2025 memoir of her mother, activist Mary Roy, and of becoming a writer."},
+ {n:5, t:"In an Antique Land", a:"Amitav Ghosh", type:"Non-fiction", lang:"English", genres:["Travel","History"], note:"History woven with travel, tracing a medieval slave across the Indian Ocean."},
+ {n:6, t:"Train to Pakistan", a:"Khushwant Singh", type:"Fiction", lang:"English", genres:["Partition","Historical"], note:"A village on the border in 1947, as Partition arrives by train."},
+ {n:7, t:"Malgudi Days", a:"R. K. Narayan", type:"Fiction", lang:"English", genres:["Short stories"], note:"Everyday life in the fictional town of Malgudi."},
+ {n:8, t:"1971", a:"Malayalam Katha-prize story (author unconfirmed)", type:"Fiction", lang:"Malayalam", genres:["Short stories"], unc:true, note:"Noted as a Katha-prize-winning Malayalam story. Author and exact title not yet verified — curator Meenakshi Sharma is herself linked to the Katha Prize Stories series."},
+ {n:9, t:"Toba Tek Singh", a:"Saadat Hasan Manto", type:"Fiction", lang:"Urdu", genres:["Partition","Short stories"], note:"The celebrated Partition story set in an asylum whose inmates are to be divided between the two new nations."},
+ {n:10, t:"Tamas", a:"Bhisham Sahni", type:"Fiction", lang:"Hindi", genres:["Partition"], note:"Communal violence in the run-up to Partition."},
+ {n:11, t:"Short stories", a:"Premchand", q:"Premchand stories", type:"Fiction", lang:"Hindi", genres:["Short stories"], note:"The foundational Hindi-Urdu short-story writer; Idgah, Kafan and more."},
+ {n:12, t:"Collected poems", a:"Faiz Ahmed Faiz", q:"Faiz Ahmed Faiz poems", type:"Poetry", lang:"Urdu", genres:["Poetry"], note:"The great Urdu poet of love and revolution."},
+ {n:13, t:"Collected poems", a:"Ahmad Faraz", q:"Ahmad Faraz poetry", type:"Poetry", lang:"Urdu", genres:["Poetry"], note:"Urdu poet known for ghazals and political defiance."},
+ {n:14, t:"Gitanjali", a:"Rabindranath Tagore", type:"Poetry", lang:"Bengali", genres:["Poetry"], note:"The song-offerings that led to the 1913 Nobel Prize."},
+ {n:15, t:"The Other Side of Silence", a:"Urvashi Butalia", type:"Non-fiction", lang:"English", genres:["Partition","Oral history"], note:"Oral histories of Partition, especially of women."},
+ {n:16, t:"Ai Ladki / Mitro Marjani", a:"Krishna Sobti", q:"Mitro Marjani Krishna Sobti", type:"Fiction", lang:"Hindi", genres:["Literary"], note:"Two landmark works by one of Hindi's boldest voices on women's lives."},
+ {n:17, t:"The Penguin History of Early India", a:"Romila Thapar", type:"Non-fiction", lang:"English", genres:["History"], note:"Standard scholarly history of early India (listed as 'History of India')."},
+ {n:18, t:"India After Gandhi", a:"Ramachandra Guha", type:"Non-fiction", lang:"English", genres:["History"], note:"A history of the Republic since 1947."},
+ {n:19, t:"Hajar Chaurashir Maa", a:"Mahasweta Devi", q:"Hajar Churashir Maa Mahasweta Devi", type:"Fiction", lang:"Bengali", genres:["Political"], note:"A mother reckoning with her son's death in the Naxalite movement."},
+ {n:20, t:"The Wordsmiths", a:"Meenakshi Sharma", q:"The Wordsmiths Meenakshi Sharma Katha", type:"Non-fiction", lang:"English", genres:["Interviews","Literary"], note:"The curator's own book (Katha, 1996): interviews with five contemporary Indian writers."},
+ {n:21, t:"Patna: Bhoole Huye Kisse", a:"Arun Singh", q:"Patna Khoya Hua Shahar Arun Singh", type:"Non-fiction", lang:"Hindi", genres:["History","Patna"], note:"Narrative history of Patna; also Patna: Khoya Hua Shahar."},
+ {n:22, t:"The Girl Who Loved to Sing: Teejan Bai", a:"Lavanya Karthik", type:"Non-fiction", lang:"English", genres:["Biography","Illustrated"], note:"Illustrated biography of the Pandavani performer, in three colours."},
+ {n:23, t:"Black: An Artist's Tribute", a:"Santosh Kumar Das", q:"Black An Artist's Tribute Tara Books", type:"Art", lang:"English", genres:["Art","Memoir","Madhubani"], note:"The Mithila artist's screenprinted memoir on black paper. Tara Books."},
+ {n:24, t:"A Suitable Boy", a:"Vikram Seth", type:"Fiction", lang:"English", genres:["Literary","Family saga"], note:"A vast novel of four families in newly independent India."},
+ {n:25, t:"Midnight's Children", a:"Salman Rushdie", type:"Fiction", lang:"English", genres:["Magical realism"], note:"Booker of Bookers. Children born at the stroke of independence."},
+ {n:26, t:"The God of Small Things", a:"Arundhati Roy", type:"Fiction", lang:"English", genres:["Literary","Kerala"], unc:true, note:"Appears twice on the list — duplicate of #3."},
+ {n:27, t:"1971: A People's History from Bangladesh, Pakistan and India", a:"Anam Zakaria", type:"Non-fiction", lang:"English", genres:["History","Bangladesh"], note:"The 1971 war through oral history across three national memories."},
+ {n:28, t:"(title not recorded)", a:"V. S. Naipaul", q:"India A Million Mutinies Now Naipaul", type:"Non-fiction", lang:"English", genres:["Travel","History"], unc:true, note:"Only the author was noted; likely one of the India trilogy or A House for Mr Biswas."},
+ {n:29, t:"A Matter of Rats: A Short Biography of Patna", a:"Amitava Kumar", type:"Non-fiction", lang:"English", genres:["Patna","Memoir"], note:"A slim, sharp portrait of Patna."},
+ {n:30, t:"The Covenant of Water", a:"Abraham Verghese", type:"Fiction", lang:"English", genres:["Family saga","Kerala"], note:"Three generations of a Kerala family across the 20th century."},
+ {n:31, t:"Early Indians", a:"Tony Joseph", type:"Non-fiction", lang:"English", genres:["History","Genetics"], note:"Who the first Indians were, told through modern DNA evidence."},
+ {n:32, t:"Byomkesh Bakshi stories", a:"Sharadindu Bandyopadhyay", q:"Byomkesh Bakshi Sharadindu", type:"Fiction", lang:"Bengali", genres:["Detective"], note:"The classic Bengali detective."},
+ {n:33, t:"Feluda collection", a:"Satyajit Ray", q:"Complete Adventures of Feluda Satyajit Ray", type:"Fiction", lang:"Bengali", genres:["Detective"], note:"Ray's beloved sleuth Feluda."},
+ {n:34, t:"The Room on the Roof", a:"Ruskin Bond", q:"The Room on the Roof Ruskin Bond", type:"Fiction", lang:"English", genres:["Coming of age"], note:"His debut and the semi-autobiographical Rusty, a boy in the hills."},
+ {n:35, t:"Raseedi Ticket (The Revenue Stamp)", a:"Amrita Pritam", q:"The Revenue Stamp Amrita Pritam", type:"Non-fiction", lang:"Punjabi", genres:["Memoir"], unc:true, note:"Author confirmed; title not recorded. Likely her memoir The Revenue Stamp. Pinjar appears at #48."},
+ {n:36, t:"City of Djinns", a:"William Dalrymple", type:"Non-fiction", lang:"English", genres:["Travel","Delhi"], note:"A year in Delhi, layer by historical layer."},
+ {n:37, t:"Shivani trilogy", a:"Shivani (Gaura Pant)", q:"Shivani Krishnakali", type:"Fiction", lang:"Hindi", genres:["Literary"], unc:true, note:"Noted as a 'trilogy'; specific titles not listed. Popular mid-century Hindi novelist."},
+ {n:38, t:"Tughlaq", a:"Girish Karnad", q:"Tughlaq Girish Karnad", type:"Drama", lang:"Kannada", genres:["Drama"], note:"His best-known play; also Hayavadana and Naga-Mandala."},
+ {n:39, t:"Samskara", a:"U. R. Ananthamurthy", q:"Samskara Ananthamurthy", type:"Fiction", lang:"Kannada", genres:["Literary","Caste"], note:"A Brahmin agrahara thrown into crisis by a death — his most famous novel."},
+ {n:40, t:"Collected verse", a:"Gulzar", q:"Gulzar selected poems", type:"Poetry", lang:"Urdu", genres:["Poetry"], unc:true, note:"Collection not specified; the poet-lyricist's nazms and triveni."},
+ {n:41, t:"Dohe / poems", a:"Kabir", q:"Kabir dohe poems", type:"Poetry", lang:"Hindi", genres:["Poetry","Bhakti"], note:"The 15th-century mystic poet's couplets."},
+ {n:42, t:"Tomb of Sand", a:"Geetanjali Shree", type:"Fiction", lang:"Hindi", genres:["Literary","Partition"], note:"International Booker 2022 (tr. Daisy Rockwell); originally Ret Samadhi."},
+ {n:43, t:"Rashmirathi", a:"Ramdhari Singh 'Dinkar'", q:"Rashmirathi Dinkar", type:"Poetry", lang:"Hindi", genres:["Poetry","Epic"], note:"Epic poem retelling Karna's story from the Mahabharata."},
+ {n:44, t:"Selected poems", a:"Mahadevi Verma", q:"Mahadevi Verma poems", type:"Poetry", lang:"Hindi", genres:["Poetry"], note:"A leading poet of the Chhayavaad movement."},
+ {n:45, t:"Srikanta", a:"Sarat Chandra Chattopadhyay", q:"Srikanta Sarat Chandra", type:"Fiction", lang:"Bengali", genres:["Literary"], note:"The wandering, semi-autobiographical classic."},
+ {n:46, t:"Maila Anchal", a:"Phanishwar Nath Renu", q:"Maila Anchal Renu", type:"Fiction", lang:"Hindi", genres:["Regional"], note:"A landmark regional (aanchalik) novel set in rural Bihar."},
+ {n:47, t:"A Fine Balance", a:"Rohinton Mistry", type:"Fiction", lang:"English", genres:["Literary","Emergency"], note:"Four lives converge during the 1975 Emergency."},
+ {n:48, t:"Pinjar", a:"Amrita Pritam", q:"Pinjar Amrita Pritam", type:"Fiction", lang:"Punjabi", genres:["Partition"], note:"A woman abducted across the new border at Partition."},
+ {n:49, t:"The Loneliness of Sonia and Sunny", a:"Kiran Desai", type:"Fiction", lang:"English", genres:["Literary"], note:"Desai's 2025 novel."},
+ {n:50, t:"The Village by the Sea", a:"Anita Desai", type:"Fiction", lang:"English", genres:["Coming of age"], note:"A brother and sister keeping a family afloat in a coastal village."},
+ {n:51, t:"Heart Lamp: Selected Stories", a:"Banu Mushtaq", type:"Fiction", lang:"Kannada", genres:["Short stories"], note:"International Booker 2025 (tr. Deepa Bhasthi); stories of Muslim women's lives in southern India."}
+];
+
+const FBMOTIF=`<svg class="fbmotif" viewBox="0 0 90 16" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="0" y1="8" x2="90" y2="8" stroke-dasharray="2 4"/><circle cx="45" cy="8" r="4.2"/><circle cx="45" cy="8" r="1.4" fill="currentColor" stroke="none"/><circle cx="20" cy="8" r="2"/><circle cx="70" cy="8" r="2"/></svg>`;
+function hkey(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}return h;}
+function primaryAuthor(a){return a.split(/[·&,]/)[0].trim();}
+
+const state={type:"All",lang:"All",genre:"All",q:""};
+const coverCache={}; // n -> url|null (resolved)
+
+const types=["All",...[...new Set(BOOKS.map(b=>b.type))]];
+const langs=["All",...[...new Set(BOOKS.map(b=>b.lang))].sort()];
+const genres=["All",...[...new Set(BOOKS.flatMap(b=>b.genres))].sort()];
+
+function makeChips(id,values,dim){
+  const c=document.getElementById(id);
+  values.forEach(v=>{
+    const b=document.createElement("button");
+    b.className="chip"+(v==="All"?" active":"");
+    b.textContent=v;
+    b.onclick=()=>{state[dim]=v;c.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));b.classList.add("active");render();};
+    c.appendChild(b);
+  });
+}
+makeChips("typeFilters",types,"type");
+makeChips("langFilters",langs,"lang");
+makeChips("genreFilters",genres,"genre");
+document.getElementById("search").addEventListener("input",e=>{state.q=e.target.value.toLowerCase();render();});
+document.getElementById("inkToggle").addEventListener("click",e=>{document.body.classList.toggle("ink");e.target.classList.toggle("on");});
+
+function matches(b){
+  if(state.type!=="All"&&b.type!==state.type)return false;
+  if(state.lang!=="All"&&b.lang!==state.lang)return false;
+  if(state.genre!=="All"&&!b.genres.includes(state.genre))return false;
+  if(state.q){const hay=(b.t+" "+b.a+" "+b.genres.join(" ")+" "+b.note+" "+b.lang+" "+b.type).toLowerCase();if(!hay.includes(state.q))return false;}
+  return true;
+}
+
+// ---- cover resolution (Google Books, then Open Library) ----
+async function fetchCover(b){
+  if(b.n in coverCache) return coverCache[b.n];
+  const query=b.q||(b.t+" "+primaryAuthor(b.a));
+  let url=null;
+  try{
+    const g=await fetch("https://www.googleapis.com/books/v1/volumes?country=US&maxResults=1&q="+encodeURIComponent(query));
+    if(g.ok){const d=await g.json();const il=d.items&&d.items[0]&&d.items[0].volumeInfo&&d.items[0].volumeInfo.imageLinks;
+      if(il){url=(il.thumbnail||il.smallThumbnail||"").replace(/^http:/,"https:").replace("&edge=curl","");}}
+  }catch(e){}
+  if(!url){
+    try{
+      const o=await fetch("https://openlibrary.org/search.json?limit=1&q="+encodeURIComponent(query));
+      if(o.ok){const d=await o.json();const doc=d.docs&&d.docs[0];
+        if(doc&&doc.cover_i){url="https://covers.openlibrary.org/b/id/"+doc.cover_i+"-M.jpg";}}
+    }catch(e){}
+  }
+  coverCache[b.n]=url;
+  return url;
+}
+
+function fallbackCover(b){
+  const k=hkey(b.a+b.t);const dark=(k%5===0||k%5===3);
+  return `<div class="fb ${dark?'dark':''}">${FBMOTIF}<div class="fbtitle">${b.t}</div><div class="fbrule"></div><div class="fbauthor">${b.a}</div></div>`;
+}
+
+function coverTile(b){
+  const el=document.createElement("div");
+  el.className="cover"+(b.unc?" unc":"");
+  el.innerHTML=`<span class="num">${String(b.n).padStart(2,'0')}</span><div class="spinef"></div>`+fallbackCover(b);
+  el.onclick=()=>openCard(b);
+  // async load real cover
+  fetchCover(b).then(url=>{
+    if(!url) return;
+    const img=new Image();
+    img.onload=()=>{
+      // remove fallback, insert image (keep num + spine)
+      const fb=el.querySelector(".fb"); if(fb) fb.remove();
+      img.alt=b.t; el.appendChild(img);
+    };
+    img.onerror=()=>{};
+    img.src=url;
+  });
+  return el;
+}
+
+function render(){
+  const list=BOOKS.filter(matches);
+  const active=state.q||state.type!=="All"||state.lang!=="All"||state.genre!=="All";
+  document.getElementById("count").textContent=list.length+" of "+BOOKS.length+" books"+(active?" shown":"");
+  const shelves=document.getElementById("shelves");
+  shelves.innerHTML="";
+  const perShelf=7;
+  for(let i=0;i<list.length;i+=perShelf){
+    const chunk=list.slice(i,i+perShelf);
+    const shelf=document.createElement("div");shelf.className="shelf";
+    const books=document.createElement("div");books.className="books";
+    chunk.forEach(b=>books.appendChild(coverTile(b)));
+    const plank=document.createElement("div");plank.className="shelf-plank";
+    shelf.appendChild(books);shelf.appendChild(plank);
+    shelves.appendChild(shelf);
+  }
+  if(list.length===0){shelves.innerHTML='<p style="text-align:center;font-style:italic;color:#8a8172;padding:40px;">No books match — try clearing a filter.</p>';}
+}
+
+function openCard(b){
+  const c=document.getElementById("card");
+  const tags=[`<span class="tag type">${b.type}</span>`,`<span class="tag lang">${b.lang}</span>`].concat(b.genres.map(g=>`<span class="tag">${g}</span>`)).join("");
+  const coverHTML=(b.n in coverCache && coverCache[b.n])?`<img src="${coverCache[b.n]}" alt="">`:`<div style="position:absolute;inset:0">${fallbackCover(b)}</div>`;
+  c.innerHTML=`
+    <button class="close" onclick="closeCard()">&times;</button>
+    <div class="card-flex">
+      <div class="card-cover">${coverHTML}</div>
+      <div class="card-main">
+        <div class="card-top">
+          <div class="cnum">No. ${String(b.n).padStart(2,'0')} of 51</div>
+          <h2>${b.t}</h2>
+          <p class="cauthor">${b.a}</p>
+        </div>
+        <div class="card-body">
+          <div class="meta">${tags}</div>
+          <p class="note">${b.note}</p>
+          ${b.unc?'<p class="flag">Flagged uncertain — handwriting or attribution not fully confirmed.</p>':''}
+        </div>
+      </div>
+    </div>`;
+  if(document.body.classList.contains("ink")){const im=c.querySelector(".card-cover img");if(im)im.style.filter="grayscale(1) contrast(1.06)";}
+  document.getElementById("overlay").classList.add("show");
+}
+function closeCard(){document.getElementById("overlay").classList.remove("show");}
+document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closeCard();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeCard();});
+
+render();
+</script>
+</body>
+</html>
