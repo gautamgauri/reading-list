@@ -253,23 +253,30 @@ function fallbackCover(b){
   return `<div class="fb ${dark?'dark':''}">${FBMOTIF}<div class="fbtitle">${b.t}</div><div class="fbrule"></div><div class="fbauthor">${b.a}</div></div>`;
 }
 
+function applyCover(el,url,b){
+  if(!url) return;
+  const img=new Image();
+  img.onload=()=>{const fb=el.querySelector(".fb");if(fb)fb.remove();img.alt=b.t;el.appendChild(img);};
+  img.onerror=()=>{};
+  img.src=url;
+}
+
+// throttled cover loader — avoids rate-limiting from firing 51 lookups at once
+let coverQueue=[];let activeLoads=0;const MAX_CONCURRENT=4;
+function pumpQueue(){
+  while(activeLoads<MAX_CONCURRENT && coverQueue.length){
+    const {b,el}=coverQueue.shift();activeLoads++;
+    fetchCover(b).then(url=>applyCover(el,url,b)).catch(()=>{}).finally(()=>{activeLoads--;pumpQueue();});
+  }
+}
+
 function coverTile(b){
   const el=document.createElement("div");
   el.className="cover"+(b.unc?" unc":"");
   el.innerHTML=`<span class="num">${String(b.n).padStart(2,'0')}</span><div class="spinef"></div>`+fallbackCover(b);
   el.onclick=()=>openCard(b);
-  // async load real cover
-  fetchCover(b).then(url=>{
-    if(!url) return;
-    const img=new Image();
-    img.onload=()=>{
-      // remove fallback, insert image (keep num + spine)
-      const fb=el.querySelector(".fb"); if(fb) fb.remove();
-      img.alt=b.t; el.appendChild(img);
-    };
-    img.onerror=()=>{};
-    img.src=url;
-  });
+  if(b.n in coverCache){applyCover(el,coverCache[b.n],b);}   // already resolved this session
+  else{coverQueue.push({b,el});}                             // queue for throttled fetch
   return el;
 }
 
@@ -279,6 +286,7 @@ function render(){
   document.getElementById("count").textContent=list.length+" of "+BOOKS.length+" books"+(active?" shown":"");
   const shelves=document.getElementById("shelves");
   shelves.innerHTML="";
+  coverQueue=[];  // rebuild queue for the tiles about to be created
   const perShelf=7;
   for(let i=0;i<list.length;i+=perShelf){
     const chunk=list.slice(i,i+perShelf);
@@ -290,6 +298,7 @@ function render(){
     shelves.appendChild(shelf);
   }
   if(list.length===0){shelves.innerHTML='<p style="text-align:center;font-style:italic;color:#8a8172;padding:40px;">No books match — try clearing a filter.</p>';}
+  pumpQueue();  // begin throttled cover loading
 }
 
 function openCard(b){
